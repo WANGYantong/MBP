@@ -4,9 +4,9 @@ clc
 rng(1);
 
 %% Generate Network
-vertice_names = {'n0','n1','n2','n3','n4','n5','n6',...
+vertice_names = {'n1','n2','n3','n4','n5','n6',...
     'n7','n8','n9','n10','n11','n12',...
-    'n13','n14','n15','n16','n17','n18'};
+    'n13','n14','n15','n16','n17','n18','n19'};
 
 numNode = length(vertice_names);
 
@@ -14,17 +14,17 @@ for v = 1:numNode
     eval([vertice_names{v},'=',num2str(v),';']);
 end
 
-gateWay=n0;
-normalRouter=n1:n12;
-accessRouter=n13:n18;
+gateWay=n1;
+normalRouter=n2:n13;
+accessRouter=n14:n19;
 
-s=[n0,n0,n0,n1,n1,n2,n2,n3,n3,n4,n4,n4,n5,n5,n5,...
-    n6,n6,n6,n7,n7,n8,n8,n8,n9,n9,n9,n10,n10,n10,...
-    n11,n11,n11,n12,n12,n13,n14,n15,n16,n17];
+s=[n1,n1,n1,n2,n2,n3,n3,n4,n4,n5,n5,n5,n6,n6,n6,...
+    n7,n7,n7,n8,n8,n9,n9,n9,n10,n10,n10,n11,n11,n11,...
+    n12,n12,n12,n13,n13,n14,n15,n16,n17,n18];
 
-t=[n1,n2,n3,n4,n5,n5,n6,n6,n7,n5,n8,n9,n6,n8,n9,...
-    n7,n10,n11,n10,n12,n9,n13,n14,n14,n10,n15,n11,n15,n16,...
-    n12,n16,n17,n17,n18,n14,n15,n16,n17,n18];
+t=[n2,n3,n4,n5,n6,n6,n7,n7,n8,n6,n9,n10,n7,n9,n10,...
+    n8,n11,n12,n11,n13,n10,n14,n15,n15,n11,n16,n12,n16,n17,...
+    n13,n17,n18,n18,n19,n15,n16,n17,n18,n19];
 
 linkCapa=[randi([360 460],1,3),randi([200 240],1,9),...
     randi([140 180],1,12),randi([60 100],1,15)];
@@ -90,8 +90,20 @@ for ii=1:numPlane
 end
 
 %% Network Parameters
+cost=zeros(numPlane,length(accessRouter));
+path=cell(size(cost));
+for ii=1:numPlane
+    for jj=1:length(accessRouter)
+        [path{ii,jj},data.N(ii,jj)]=shortestpath(plane{ii},accessRouter(jj),gateWay);
+    end
+end
 
+data.delta=zeros(numPlane,length(accessRouter),numLink);
+% generate delta array
 
+data.bandwidthT=0.15; % bandwidth request of tactile demand, 150kbps
+data.bandwidthB=0.5;  % bandwidth request of best effort demand, 500kbps 
+data.bandwidthL=linkCapa; % bandwidth upperbound for each link, unit: Mbps
 
 %% Decision Variable
 
