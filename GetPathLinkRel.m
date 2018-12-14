@@ -38,7 +38,7 @@ for ii = 1:counter_a
         end
     end
 end
-
+beta=beta';
 end
 
 function link = FindLink(path,arcs,direction)

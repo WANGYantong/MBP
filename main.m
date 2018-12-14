@@ -99,7 +99,9 @@ for ii=1:numPlane
 end
 
 data.delta=zeros(numPlane,length(accessRouter),numLink);
-% generate delta array
+for ii=1:numPlane
+    data.delta(ii,:,:)=GetPathLinkRel(plane{ii},'undirected',path(ii,:)',length(accessRouter),length(gateWay));
+end
 
 data.bandwidthT=0.15; % bandwidth request of tactile demand, 150kbps
 data.bandwidthB=0.5;  % bandwidth request of best effort demand, 500kbps 
