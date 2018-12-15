@@ -3,7 +3,7 @@ clc
 
 rng(1);
 
-%% Generate Network
+%% Generate Network Topology
 vertice_names = {'n1','n2','n3','n4','n5','n6',...
     'n7','n8','n9','n10','n11','n12',...
     'n13','n14','n15','n16','n17','n18','n19'};
@@ -89,6 +89,14 @@ for ii=1:numPlane
     
 end
 
+%% Network flow
+
+Tac=2;   %tactile task assigned to each access router
+Tac_ratio=4; % the ratio between tactile task and best effort
+
+ flow_T=1:length(accessRouter)*Tac; % the set of all tactile tasks
+ flow_B=1:length(accessRouter)*Tac*Tac_ratio; % the set of all best effort demands
+
 %% Network Parameters
 cost=zeros(numPlane,length(accessRouter));
 path=cell(size(cost));
@@ -107,12 +115,34 @@ data.bandwidthT=0.15; % bandwidth request of tactile demand, 150kbps
 data.bandwidthB=0.5;  % bandwidth request of best effort demand, 500kbps 
 data.bandwidthL=linkCapa; % bandwidth upperbound for each link, unit: Mbps
 
+data.probabilityT=zeros(length(flow_T),length(accessRouter));
+for ii=1:length(flow_T)
+    data.probabilityT(ii,ceil(ii/Tac))=1;
+end
+data.probabilityB=zeros(length(flow_B),length(accessRouter));
+for ii=1:length(flow_B)
+    data.probabilityB(ii,ceil(ii/(Tac*Tac_ratio)))=1;
+end
+
 %% Decision Variable
+x_T=optimvar('x_T',length(flow_T),numPlane,length(accessRouter),...
+    'Type','integer','LowerBound',0,'UpperBound',1);
+x_B=optimvar('x_B',length(flow_B),numPlane,length(accessRouter),...
+    'Type','integer','LowerBound',0,'UpperBound',1);
 
+y=optimvar('y',numLink,'LowerBound',0);
+z_T=optimvar('z_T',length(flow_T),numPlane,length(accessRouter),...
+    numLink,'LowerBound',0);
+z_B=optimvar('z_B',length(flow_B),numPlane,length(accessRouter),...
+    numLink,'LowerBound',0);
 
+%% Constraints
+Tpath_constr=sum(sum(x_T,3),2)==1;
 
+probT_x=repmat(data.probabilityT,[numPlane,1,1]);
+probT_x=reshape(probT_x,length(flow_T),numPlane,length(accessRouter));
 
-%% Optimization Objective & Constraints
+%% Optimization Model
 
 
 
