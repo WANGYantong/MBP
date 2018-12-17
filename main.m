@@ -141,7 +141,24 @@ Tpath_constr=sum(sum(x_T,3),2)==1;
 
 probT_x=repmat(data.probabilityT,[numPlane,1,1]);
 probT_x=reshape(probT_x,length(flow_T),numPlane,length(accessRouter));
+accessT_constr=x_T<=probT_x;
+probB_x=repmat(data.probabilityB,[numPlane,1,1]);
+probB_x=reshape(probB_x,length(flow_B),numPlane,length(accessRouter));
+accessB_constr=x_B<=probB_x;
 
+[m,n,l]=size(data.delta);
+delta_mid=reshape(data.delta,1,m*n*l);
+delta_T=repmat(delta_mid,[length(flow_T),1]);
+delta_T=reshape(delta_T,length(flow_T),numPlane,length(accessRouter),numLink);
+delta_B=repmat(delta_mid,[length(flow_B),1]);
+delta_B=reshape(delta_B,length(flow_B),numPlane,length(accessRouter),numLink);
+x_Tz=repmat(x_T,[1,1,1,numLink]);
+x_Bz=repmat(x_B,[1,1,1,numLink]);
+bandwidth_constr=squeeze(sum(sum(sum(data.bandwidthT*delta_T.*x_Tz,3),2),1)+...
+    sum(sum(sum(data.bandwidthB*delta_B.*x_Bz,3),2),1))<=data.bandwidthL';
+
+relax_constr=data.bandwidthL'.*y-squeeze(sum(sum(sum(data.bandwidthT*delta_T.*z_T,3),2),1)+...
+    sum(sum(sum(data.bandwidthB*delta_B.*z_B,3),2),1))==1;
 %% Optimization Model
 
 
