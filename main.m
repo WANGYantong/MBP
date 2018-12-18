@@ -159,14 +159,47 @@ bandwidth_constr=squeeze(sum(sum(sum(data.bandwidthT*delta_T.*x_Tz,3),2),1)+...
 
 relax_constr=data.bandwidthL'.*y-squeeze(sum(sum(sum(data.bandwidthT*delta_T.*z_T,3),2),1)+...
     sum(sum(sum(data.bandwidthB*delta_B.*z_B,3),2),1))==1;
+
+M=1000;
+y_Tz=repmat(y',[length(flow_T)*numPlane*length(accessRouter),1]);
+y_Tz=reshape(y_Tz,length(flow_T),numPlane,length(accessRouter),numLink);
+zTdefine1_constr=z_T<=y_Tz;
+zTdefine2_constr=z_T<=M*x_Tz;
+zTdefine3_constr=z_T>=M*(x_Tz-1)+y_Tz;
+
+y_Bz=repmat(y',[length(flow_B)*numPlane*length(accessRouter),1]);
+y_Bz=reshape(y_Bz,length(flow_B),numPlane,length(accessRouter),numLink);
+zBdefine1_constr=z_B<=y_Bz;
+zBdefine2_constr=z_B<=M*x_Bz;
+zBdefine3_constr=z_B>=M*(x_Bz-1)+y_Bz;
+
+%% Objective Function
+cost_T=sum(sum(sum(sum(data.bandwidthT*delta_T.*z_T,4),3),2),1);
+cost_B=sum(sum(sum(sum(data.bandwidthB*delta_B.*z_B,4),3),2),1);
+
 %% Optimization Model
+MBP=optimproblem;
 
+MBP.Objective=cost_T+cost_B;
 
-
+MBP.Constraints.Tpath_constr=Tpath_constr;
+MBP.Constraints.accessT_constr=accessT_constr;
+MBP.Constraints.accessB_constr=accessB_constr;
+MBP.Constraints.bandwidth_constr=bandwidth_constr;
+MBP.Constraints.relax_constr=relax_constr;
+MBP.Constraints.zTdefine1_constr=zTdefine1_constr;
+MBP.Constraints.zTdefine2_constr=zTdefine2_constr;
+MBP.Constraints.zTdefine3_constr=zTdefine3_constr;
+MBP.Constraints.zBdefine1_constr=zBdefine1_constr;
+MBP.Constraints.zBdefine2_constr=zBdefine2_constr;
+MBP.Constraints.zBdefine3_constr=zBdefine3_constr;
 
 %% Solve the Problem
+opts=optimoptions('intlinprog','Display','iter','MaxTime',1800);
 
-
+tic;
+[sol,fval,exitflag,output]=solve(MBP,'Options',opts);
+MILP_time=toc;
 
 
 %% Visualize Solution
