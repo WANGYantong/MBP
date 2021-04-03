@@ -22,7 +22,7 @@ end
 access_constr=x<=1e3*lambda_x;
 
 % Objective
-benefit=-sum(x.*para.earning,'all');
+benefit=-sum(x*para.earning,'all');
 
 % Optimization Model
 MILP=optimproblem;
@@ -32,7 +32,7 @@ MILP.Constraints.constr1=path_constr;
 MILP.Constraints.constr2=link_constr;
 MILP.Constraints.constr3=access_constr;
 
-opts=optimoptions('linprog','Display','iter');
+opts=optimoptions('linprog','Display','off');
 
 [sol,fval,~,~]=solve(MILP,'Options',opts);
 solution.X=sol.X_aep;

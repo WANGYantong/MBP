@@ -1,31 +1,59 @@
-function para=GetPara(topo,NUM_User)
+function [paraT,paraB,link_bandwidth] = GetPara(topo,opt)
 
-[NUM_Link,NUM_AR,NUM_EC,~]=size(topo.B_laep);
-NUM_EC=NUM_EC-1;
-NUM_File=20;
-Pop_Ratio=1;
+[num_link,~,~,~]=size(topo.B_laep);
 
-para.alpha=2.5*1e-9*1024*1024*8; % caching factor (Watt/MB) 
-para.beta=4*1e-8*1024*1024; % transmitting factor (Joule/Mb)
+% link bandwidth
+link_bandwidth=zeros(num_link,1);
+level1=1:5;
+level2=6:14;
+level3=15:26;
+level4=27:41;
+link_bandwidth(level1)=randi([240,280],length(level1),1);
+link_bandwidth(level2)=randi([160,200],length(level2),1);
+link_bandwidth(level3)=randi([100,140],length(level3),1);
+link_bandwidth(level4)=randi([40,80],length(level4),1);
 
-para.s_n=randi([1,10],NUM_File,1)*10; % content size (MB) 
-para.b_n=para.s_n; % content bandwidth (Mbps), which is corresponding to its size
-para.w_e=ones(NUM_EC,1)*1024; % caching space (MB) - 1GB, 2GB, 10GB
-para.c_l=ones(NUM_Link,1)*1024; % link capacity (Mbps) - 1Gbps, 2Gbps, 10Gbps
-para.T=10; % time period (second)
-
-rho_kn=zeros(NUM_User,NUM_File);
-pi_ka=zeros(NUM_User,NUM_AR);
-for ii=1:NUM_User
-    rho_kn(ii,randi([1,NUM_File*Pop_Ratio]))=1;
-    pi_ka(ii,randi([1,NUM_AR]))=1;
-end
-
-para.lambda_na=zeros(NUM_File,NUM_AR);
-for ii=1:NUM_File
-    for jj=1:NUM_AR
-        para.lambda_na(ii,jj)=rho_kn(:,ii)'*pi_ka(:,jj);
-    end
+switch opt
+   
+    case 1
+        % tactile traffic
+        paraT.earning=1;
+        paraT.path_bandwidth=40:5:65;
+        paraT.lambda=[1,0,0,0,0,1];
+        paraT.provision=0.2:0.2:1;
+        
+        % best effort flow
+        paraB.earning=1;
+        paraB.path_bandwidth=120;
+        paraB.lambda=[1,1,1,1,1,1];
+        
+    case 2
+        % tactile traffic
+        paraT.earning=1;
+        paraT.path_bandwidth=40;
+        paraT.lambda=[1,0,0,0,0,1];
+        paraT.provision=0.2:0.2:1;
+        
+        % best effort flow
+        paraB.earning=1;
+        paraB.path_bandwidth=90:10:140;
+        paraB.lambda=[1,1,1,1,1,1];
+        
+    case 3
+        % tactile traffic
+        paraT.earning=1:0.2:2;
+        paraT.path_bandwidth=40;
+        paraT.lambda=[1,0,0,0,0,1];
+        paraT.provision=0.2:0.2:1;
+        
+        % best effort flow
+        paraB.earning=1;
+        paraB.path_bandwidth=120;
+        paraB.lambda=[1,1,1,1,1,1];
+        
+    otherwise
+        error('The available topo option is 1,2,3!');
+        
 end
 
 end
