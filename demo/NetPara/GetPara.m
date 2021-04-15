@@ -51,8 +51,20 @@ switch opt
         paraB.path_bandwidth=120;
         paraB.lambda=[1,1,1,1,1,1];
         
+    case 4
+        % tactile traffic
+        paraT.earning=[1:0.2:2,3:1:8];
+        paraT.path_bandwidth=[40:-2:30,25:-5:0];
+        paraT.lambda=[1,0,0,0,0,1];
+        paraT.provision=0.2:0.2:1;
+        
+        % best effort flow
+        paraB.earning=1;
+        paraB.path_bandwidth=120;
+        paraB.lambda=[1,1,1,1,1,1];
+        
     otherwise
-        error('The available topo option is 1,2,3!');
+        error('The available topo option is 1,2,3,4!');
         
 end
 

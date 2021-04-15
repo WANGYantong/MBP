@@ -7,11 +7,11 @@ rng(1);
 %% Network Parameters
 topo=GetTopo(2);
 
-opt=4;
+opt=3;
 [paraT,paraB,link_bandwidth]=GetPara(topo,opt);
 
 %% Bandwidth Allocation && Figure Drawing
-marker=["-o","-+","-*","-x","-s","-d",":o",":+",":*",":x",":s",":d"];
+marker=["-o","-+","-*","-x","-s","-d"];
 curve_LineWidth=5.6;
 curve_MarkerSize=20;
 box_LineWidth=3.6;
@@ -173,7 +173,6 @@ switch opt
             end
         end
         
-        figure(1);
         xx=paraT.provision;
         hold on;
         for ii=1:II
@@ -184,20 +183,9 @@ switch opt
         ylabel('Total Revenue');
         set(gca,'LineWidth',box_LineWidth,'FontSize',box_FontSize,'FontWeight','bold')
         lgd=legend({'1','1.2','1.4','1.6','1.8','2','3','4','5','6','7','8'},...
-            'Orientation','horizontal','Location','south','FontSize',lgd_FontSize-10);
+            'Orientation','horizontal','Location','south','FontSize',lgd_FontSize);
         title(lgd,'Tactile Earning Unit');
         grid minor;
         box on;
-        
-        [px,~]=gradient(revenue);
-        figure(2);
-        s=surf(px,'FaceAlpha',0.5,'FaceColor','interp');
-        ylabel('Tactice Earning Unit');
-        xlabel('Tactile Bandwidth Provisioning');
-        xticklabels({'0.2','0.4','0.6','0.8','1'});
-        zlabel('Gradient');
-        set(gca,'LineWidth',box_LineWidth,'FontSize',box_FontSize-10,'FontWeight','bold');
-        colorbar;
-        view(0,90);
 
 end
