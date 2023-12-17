@@ -5,9 +5,9 @@ addpath(genpath(pwd));
 
 rng(1);
 %% Network Parameters
-topo=GetTopo(2);
+topo=GetTopo(3);
 
-opt=4;
+opt=5;
 [paraT,paraB,link_bandwidth]=GetPara(topo,opt);
 
 %% Bandwidth Allocation && Figure Drawing
@@ -180,8 +180,9 @@ switch opt
             plot(xx,revenue(ii,:),marker(ii),'LineWidth',curve_LineWidth,'MarkerSize',curve_MarkerSize);
         end
         hold off;
-        xlabel('Tactile Bandwdith Provisioning');
+        xlabel('Tactile Bandwidth Provisioning');
         ylabel('Total Revenue');
+        ylim([640 850]);
         set(gca,'LineWidth',box_LineWidth,'FontSize',box_FontSize,'FontWeight','bold')
         lgd=legend({'1','1.2','1.4','1.6','1.8','2','3','4','5','6','7','8'},...
             'Orientation','horizontal','Location','south','FontSize',lgd_FontSize-10);
@@ -199,5 +200,60 @@ switch opt
         set(gca,'LineWidth',box_LineWidth,'FontSize',box_FontSize-10,'FontWeight','bold');
         colorbar;
         view(0,90);
+
+    case 5
+        II=length(paraT.earning);
+        JJ=length(paraT.lambda);
+        revenue=zeros(II,JJ);
+        running_time=zeros(II,JJ);
+        for ii=1:II
+            paraT.earningC=paraT.earning(ii);
+            paraB.earningC=paraB.earning(ii);
+            for jj=1:JJ
+                paraT.constr=paraT.lambda(jj);
+                tic;
+                for kk=1:20
+                    solution=SolveMILP2(topo,paraT,paraB,link_bandwidth);
+                end
+                time=toc;
+                revenue(ii,jj)=solution.fval;
+                running_time(ii,jj)=time/20;
+            end
+        end
+
+        figure(1);
+        xx=paraT.lambda;
+        hold on;
+        for ii=1:II
+            plot(xx,revenue(ii,:),marker(ii),'LineWidth',curve_LineWidth,...
+                'MarkerSize',curve_MarkerSize);
+        end
+        hold off;
+        xlabel('Tactile Demand');
+        ylabel('Total Revenue');
+        xlim([10,80]);
+        set(gca,'LineWidth',box_LineWidth,'FontSize',box_FontSize,'FontWeight','bold')
+        lgd=legend({'1:9','2:8','3:7','4:6','5:5','6:4'},...
+            'Orientation','horizontal','Location','south','FontSize',lgd_FontSize-10);
+        title(lgd,'Earning Ratio-Tactile:Best Effort');
+        grid minor;
+        box on;
+
+        figure(2);
+        hold on;
+        for ii=1:II
+            plot(xx,running_time(ii,:),marker(ii),'LineWidth',curve_LineWidth,...
+                'MarkerSize',curve_MarkerSize);
+        end
+        hold off;
+        xlabel('Tactile Demand');
+        ylabel('Time Complexity');
+        xlim([10,80]);
+        set(gca,'LineWidth',box_LineWidth,'FontSize',box_FontSize,'FontWeight','bold')
+        lgd=legend({'1:9','2:8','3:7','4:6','5:5','6:4'},...
+            'Orientation','horizontal','Location','north','FontSize',lgd_FontSize-10);
+        title(lgd,'Earning Ratio-Tactile:Best Effort');
+        grid minor;
+        box on;
 
 end

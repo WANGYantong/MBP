@@ -16,8 +16,15 @@ switch case_number
         YData=[8,6,6,6,4,4,4,4,2,2,2,2,2,0,0,0,0,0,0];
         weights=ones(size(s));
         G=graph(s,t,weights);
+    case 3
+        s=[1,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,10,11,11,12,12,12,13,13];
+        t=[2,3,4,5,7,5,8,6,8,9,10,9,11,11,13,12,13,14,15,14,15,16,16,17,17,18,19,18,19];
+        XData=[0,-2,0,2,-3,-1,1,3,-4,-2,0,2,4,-5,-3,-1,1,3,5];
+        YData=[8,6,6,6,4,4,4,4,2,2,2,2,2,0,0,0,0,0,0];
+        weights=ones(size(s));
+        G=graph(s,t,weights);
     otherwise
-        error('The available topo option is 1');
+        error('The available topo option is 1-3');
 end
 
 % plot(G,'LineWidth',1.5,'Marker','o','MarkerSize',10,...
